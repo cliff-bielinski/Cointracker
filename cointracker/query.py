@@ -1,5 +1,4 @@
 import requests
-from pprint import pprint
 
 def request_data(data_type, coin, subreddit, timeframe, size):
     """
