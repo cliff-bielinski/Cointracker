@@ -17,5 +17,3 @@ def request_data(data_type, coin, subreddit, timeframe, size):
     data = requests.get(url, params=search_params)
 
     return data.json()
-
-pprint(request_data('submission', 'BTC', 'CryptoCurrency', '30d', '1'))
