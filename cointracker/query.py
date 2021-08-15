@@ -8,6 +8,8 @@ def request_data(data_type, coin, subreddit, timeframe, size):
     returns query results in JSON
 
     https://github.com/pushshift/api
+
+    Harrison test
     """
 
     search_params = {'q': coin, 'subreddit': subreddit, 'after': timeframe, 'size': size}
