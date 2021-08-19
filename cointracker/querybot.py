@@ -1,24 +1,71 @@
 import praw
+import requests
+import json
 
-# initializes an instance of Reddit using Python Reddit API wrapper
-reddit = praw.Reddit('coinbot', user_agent='cryptoscraper bot')
+def create_reddit(praw_bot, bot_desc):
+    """
+    creates an instance of Reddit using Python Reddit API Wrapper
+    Read more: https://praw.readthedocs.io/en/stable/index.html
+    """
+    return praw.Reddit(praw_bot, user_agent = bot_desc)
 
-comment_list = []
+def get_comments(reddit, subreddit, submission_num):
+    """
+    returns a list of comment objects using the Reddit API
+    submission_num is an integer for the number of submissions to take comments from (sorted by "Hot")
+    """
+    comments = []
 
-# iterates through the hottest submission of the subreddit and adds every comment object to a list
-for submission in reddit.subreddit("MUD").hot(limit=1):
-    submission.comments.replace_more(limit=None)
-    for comment in submission.comments.list():
-        comment_list.append(comment)
+    for submission in reddit.subreddit(subreddit).hot(limit = submission_num):
+        submission.comments.replace_more(limit=None) # flattens comment tree without limit
+        for comment in submission.comments.list():
+            comments.append(comment)
+    
+    return comments
 
-for comment in comment_list:
-    print("Time:", comment.created_utc)
-    print("ID:", comment.id)
-    print("Parent_ID:", comment.parent_id)
-    print("Link_ID:", comment.link_id)
-    print("Subreddit_ID:", comment.subreddit_id)
-    print("Author:", comment.author.name)
-    print("Author_ID:", comment.author.id)
-    print("Score:", comment.score)
-    print("Comment:", comment.body)
-    print()
+def get_coin_list(num_coins):
+    """
+    Returns a list of coin objects sorted by market cap using by calling coingecko API
+    Read more: https://www.coingecko.com/en/api/documentation
+    """
+    pages = 1 + (num_coins // 250)
+    remainder = num_coins % 250
+    coins = []
+    url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc'
+    
+    for page in range(1, pages):
+        coins.extend(requests.get(url + f'&per_page=250&page={page}').json())
+    coins.extend(requests.get(url + f'&per_page={remainder}').json())
+
+    return coins    
+
+def make_coin_dict(coin_list):
+    """takes a list of coin objects and returns a map of cryptocurrency names and symbols to coin IDs"""
+    coin_dictionary = {}
+
+    for coin in coin_list:
+        coin_dictionary[coin['id'].lower()] = coin['id']
+        coin_dictionary[coin['symbol'].lower()] = coin['id']
+        coin_dictionary[coin['name'].lower()] = coin['id']
+
+    return coin_dictionary
+
+
+reddit = create_reddit('coinbot', 'cryptoscraper bot')
+
+coin_reference = make_coin_dict(get_coin_list(1000))
+
+comment_list = get_comments(reddit, 'MUD', 1)
+    
+
+# for comment in comment_list:
+#     print("Time:", comment.created_utc)
+#     print("ID:", comment.id)
+#     print("Parent_ID:", comment.parent_id)
+#     print("Link_ID:", comment.link_id)
+#     print("Subreddit_ID:", comment.subreddit_id)
+#     print("Author:", comment.author.name)
+#     print("Author_ID:", comment.author.id)
+#     print("Score:", comment.score)
+#     print("Comment:", comment.body)
+#     print()
