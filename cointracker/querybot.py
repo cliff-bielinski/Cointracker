@@ -22,14 +22,14 @@ def get_coin_list(num_coins):
     Read more: https://www.coingecko.com/en/api/documentation
     """
     min_requestable_pages = math.ceil(num_coins / 250)
-    resuts_per_page = math.ceil(num_coins / min_requestable_pages)
+    results_per_page = math.ceil(num_coins / min_requestable_pages)
     
     coins = []
     url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc'
     
     # iterates through a paginated API response to get all coins
-    for pageNumber in range(min_requestable_pages):
-        response = requests.get(url + f'&per_page=250&page={pageNumber+1}').json() 
+    for page_number in range(min_requestable_pages):
+        response = requests.get(url + f'&per_page={results_per_page}&page={page_number+1}').json() 
         if response:
             coins += response
         else:
