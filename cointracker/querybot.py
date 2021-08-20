@@ -1,5 +1,6 @@
 import praw
 import requests
+import math
 
 def get_comments(reddit, subreddit, submission_num):
     """
@@ -18,19 +19,21 @@ def get_comments(reddit, subreddit, submission_num):
 def get_coin_list(num_coins):
     """
     Returns a list of coin objects sorted by market cap using by calling coingecko API
-    num_coins is integer in interval of 250
     Read more: https://www.coingecko.com/en/api/documentation
     """
-    pages = 1 + (num_coins // 250)
+    pages = math.ceil(num_coins / 250)
     remainder = num_coins % 250
     coins = []
     url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc'
     
     # iterates through a paginated API response to get all coins
-    for page in range(1, pages):
+    for page in range(1, pages + 1):
         coins += requests.get(url + f'&per_page=250&page={page}').json()
-    coins += requests.get(url + f'&per_page={remainder}&page={pages}').json()
-
+    
+    # truncates excess coins from API call
+    if remainder != 0:
+        coins = coins[:-(250-remainder)]
+    
     return coins    
 
 def make_coin_dict(coin_list):
@@ -61,4 +64,3 @@ if __name__ == '__main__':
 #     print("Author_ID:", comment.author.id)
 #     print("Score:", comment.score)
 #     print("Comment:", comment.body)
-#     print()
