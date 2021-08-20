@@ -1,13 +1,5 @@
 import praw
 import requests
-import json
-
-def create_reddit(praw_bot, bot_desc):
-    """
-    creates an instance of Reddit using Python Reddit API Wrapper
-    Read more: https://praw.readthedocs.io/en/stable/index.html
-    """
-    return praw.Reddit(praw_bot, user_agent = bot_desc)
 
 def get_comments(reddit, subreddit, submission_num):
     """
@@ -26,6 +18,7 @@ def get_comments(reddit, subreddit, submission_num):
 def get_coin_list(num_coins):
     """
     Returns a list of coin objects sorted by market cap using by calling coingecko API
+    num_coins is integer in interval of 250
     Read more: https://www.coingecko.com/en/api/documentation
     """
     pages = 1 + (num_coins // 250)
@@ -33,9 +26,10 @@ def get_coin_list(num_coins):
     coins = []
     url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc'
     
+    # iterates through a paginated API response to get all coins
     for page in range(1, pages):
-        coins.extend(requests.get(url + f'&per_page=250&page={page}').json())
-    coins.extend(requests.get(url + f'&per_page={remainder}').json())
+        coins += requests.get(url + f'&per_page=250&page={page}').json()
+    coins += requests.get(url + f'&per_page={remainder}&page={pages}').json()
 
     return coins    
 
@@ -51,11 +45,10 @@ def make_coin_dict(coin_list):
     return coin_dictionary
 
 
-reddit = create_reddit('coinbot', 'cryptoscraper bot')
-
-coin_reference = make_coin_dict(get_coin_list(1000))
-
-comment_list = get_comments(reddit, 'MUD', 1)
+if __name__ == '__main__':
+    reddit = praw.Reddit('coinbot', user_agent = 'cryptoscraper bot')
+    coin_reference = make_coin_dict(get_coin_list(1000))
+    comment_list = get_comments(reddit, 'MUD', 1)
     
 
 # for comment in comment_list:
