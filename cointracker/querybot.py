@@ -5,7 +5,14 @@ import math
 def get_comments(reddit, subreddit, submission_num):
     """
     returns a list of comment objects using the Reddit API
-    submission_num is an integer for the number of submissions to take comments from (sorted by "Hot")
+
+    Args:
+        reddit (obj) - PRAW reddit instance
+        subreddit (str) - name of subreddit to return comments from
+        submission_num (int) - number of submission posts to return comments from in subreddit (sorted by 'Hot')
+
+    Returns:
+        A list of comment objects 
     """
     comments = []
 
@@ -20,6 +27,12 @@ def get_coin_list(num_coins):
     """
     Returns a list of coin objects sorted by market cap using by calling coingecko API
     Read more: https://www.coingecko.com/en/api/documentation
+
+    Args:
+        num_coins (int) - the number of coins to return sorted by market cap
+
+    Returns:
+        A list of coin objects
     """
     min_requestable_pages = math.ceil(num_coins / 250)
     results_per_page = math.ceil(num_coins / min_requestable_pages)
@@ -44,7 +57,15 @@ def get_coin_list(num_coins):
     return coins    
 
 def make_coin_dict(coin_list):
-    """takes a list of coin objects and returns a map of cryptocurrency names and symbols to coin IDs"""
+    """
+    Takes a list of coin objects and returns a map of cryptocurrency names and symbols to coin IDs
+    
+    Args:
+        coin_list (list) - a list of coin objects
+
+    Returns:
+        a dictionary of coin names and symbols mapped to coin ID
+    """
     coin_dictionary = {}
 
     for coin in coin_list:
