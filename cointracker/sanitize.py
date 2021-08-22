@@ -10,8 +10,9 @@ def remove_whitespace(comment):
     return comment.strip()
 
 def sanitize_text(comment):
-    """takes string and returns sanitized version without punctuation, whitepace or capitalization"""
+    """takes string and returns a tokenized list of words without punctuation, whitepace or capitalization"""
     comment = comment.lower()
     comment = remove_punctuation(comment)
     comment = remove_whitespace(comment)
+    comment = comment.split()
     return comment
