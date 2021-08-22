@@ -75,6 +75,23 @@ def make_coin_dict(coin_list):
 
     return coin_dictionary
 
+def find_coins(tokenized_comment, coins):
+    """
+    returns a set of coins found in the body of the comment text
+
+    Args:
+        comment (list) - list of words found in a comment
+        coins (dict) - dictionary of reference cryptocurrency
+
+    Returns:
+        a set of coin IDs
+    """
+    matches = set()
+    for word in tokenized_comment:
+        if word in coins:
+            matches.add(coins[word])
+    return matches
+
 
 if __name__ == '__main__':
     reddit = praw.Reddit('coinbot', user_agent = 'cryptoscraper bot')
