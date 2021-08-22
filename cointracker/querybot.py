@@ -1,6 +1,5 @@
 import praw
-import requests
-import math
+import wallet
 
 def get_comments(reddit, subreddit, submission_num):
     """
@@ -23,62 +22,9 @@ def get_comments(reddit, subreddit, submission_num):
     
     return comments
 
-def get_coin_list(num_coins):
-    """
-    Returns a list of coin objects sorted by market cap using by calling coingecko API
-    Read more: https://www.coingecko.com/en/api/documentation
-
-    Args:
-        num_coins (int) - the number of coins to return sorted by market cap
-
-    Returns:
-        A list of coin objects
-    """
-    min_requestable_pages = math.ceil(num_coins / 250)
-    results_per_page = math.ceil(num_coins / min_requestable_pages)
-    
-    coins = []
-    url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc'
-    
-    # iterates through a paginated API response to get all coins
-    for page_number in range(min_requestable_pages):
-        response = requests.get(url + f'&per_page={results_per_page}&page={page_number+1}').json() 
-        if response:
-            coins += response
-        else:
-            break
-    
-    # truncates excess coins from API call
-    remainder = len(coins) - num_coins
-    
-    if remainder > 0:
-        coins = coins[:-remainder]
-    
-    return coins    
-
-def make_coin_dict(coin_list):
-    """
-    Takes a list of coin objects and returns a map of cryptocurrency names and symbols to coin IDs
-    
-    Args:
-        coin_list (list) - a list of coin objects
-
-    Returns:
-        a dictionary of coin names and symbols mapped to coin ID
-    """
-    coin_dictionary = {}
-
-    for coin in coin_list:
-        coin_dictionary[coin['id'].lower()] = coin['id']
-        coin_dictionary[coin['symbol'].lower()] = coin['id']
-        coin_dictionary[coin['name'].lower()] = coin['id']
-
-    return coin_dictionary
-
-
 if __name__ == '__main__':
     reddit = praw.Reddit('coinbot', user_agent = 'cryptoscraper bot')
-    coin_reference = make_coin_dict(get_coin_list(1000))
+    coin_wallet = wallet.Wallet(1000)
     comment_list = get_comments(reddit, 'MUD', 1)
     
 
