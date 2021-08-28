@@ -81,4 +81,4 @@ class Wallet:
             if word in self._coin_dict:
                 matches.add(self._coin_dict[word])
 
-        return matches
+        return list(matches)

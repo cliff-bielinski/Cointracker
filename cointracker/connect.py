@@ -29,7 +29,7 @@ def insert_row(table_name, data):
         # SQL query for insertion into subreddits table
         subreddit_query = """
             INSERT INTO subreddits (subreddit_id, subreddit_name)
-            VALUES (%(subreddit_id)s, %(subreddit_name)s)
+            VALUES (%s, %s)
             ON CONFLICT (subreddit_id)
             DO NOTHING;
             """
@@ -37,15 +37,15 @@ def insert_row(table_name, data):
         # SQL query for insertion into authors table
         author_query = """
             INSERT INTO authors (author_id, author_name)
-            VALUES (%(author_id)s, %(author_name)s)
+            VALUES (%s, %s)
             ON CONFLICT (author_id)
             DO NOTHING;
             """
 
         # SQL query for insertion into submissions table
         submission_query = """
-            INSERT INTO submissions (post_id, post_name, author_id, coin_id, subreddit_id, submission_time)
-            VALUES (%(id)s, %(name)s, %(author)s, %(coin)s, %(subreddit_id)s, %(time)s)
+            INSERT INTO submissions (post_id, post_name, author_id, coin_id, subreddit_id, submission_time, body)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (post_id)
             DO NOTHING;
             """
@@ -69,6 +69,44 @@ def insert_row(table_name, data):
 
     except (Exception, psycopg2.Error) as error:
         print(f"Failed to insert record into {table_name} table", error)
+
+    finally:
+        # closes connection
+        if connection:
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+def post_exists(id):
+    """
+    connect to the database server and check whether a post_id already exists
+
+    Args:
+        id(str) - post_id to check in db
+    
+    Returns:
+        (bool) whether the post_id already exists in the db
+    """
+    
+    try:
+        db_params = config('postgresql')  # stored in database.ini file
+
+        print("Connecting to the database...")
+        connection = psycopg2.connect(**db_params)
+        cursor = connection.cursor()
+
+        exists_query = """
+            select exists (
+                select 1
+                from submissions
+                where post_id = %s
+            )"""
+        
+        cursor.execute(exists_query, (id,))
+        return cursor.fetchone()[0]
+    
+    except (Exception, psycopg2.Error) as error:
+        print(f"Failed to query submissions table", error)
 
     finally:
         # closes connection
