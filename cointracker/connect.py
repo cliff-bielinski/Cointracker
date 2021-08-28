@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.extras import execute_batch
 from config.config import config
 
 def insert_row(table_name, data):
@@ -13,7 +14,7 @@ def insert_row(table_name, data):
     """
     def commit_row(query):
         """executes SQL query and commits it to database"""
-        cursor.execute(query, data)
+        execute_batch(cursor, query, data)
         connection.commit()
         count = cursor.rowcount
         print(count, f'row inserted successfully into {table_name} table')
@@ -75,4 +76,6 @@ def insert_row(table_name, data):
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
-    
+
+def check_duplicate(comment_id):
+    """returns True if comment_id already exists in the database"""

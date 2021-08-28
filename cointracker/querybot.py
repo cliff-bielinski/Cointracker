@@ -1,7 +1,7 @@
 import praw
 import wallet
 import sanitize
-from datetime import datetime, timezone
+from datetime import datetime
 import connect
 
 def get_comments(reddit, subreddit, submission_num):
@@ -77,24 +77,38 @@ if __name__ == '__main__':
     coin_wallet = wallet.Wallet(1000)
     comment_list, submission_list = get_comments(reddit, 'MUD', 1)
 
+    new_subreddits = []
+    new_authors = []
+    new_posts = []
+    new_comments = []
+
     # prepares and inserts data from every submission returned from api call into the db
     for submission in submission_list:
+        
+        # skips over deleted submission
+        if submission.author is None: continue
+
         sanitized_submission = sanitize.sanitize_text(submission.selftext)
         submission_coins = list(coin_wallet.match_coins(sanitized_submission))
-        prepared_subreddit = prepare_subreddit(submission)
-        prepared_author = prepare_author(submission)
-        prepared_submission = prepare_submission(submission, sanitized_submission, submission_coins)
-        print(prepared_subreddit)
-        connect.insert_row('subreddits', prepared_subreddit)
-        connect.insert_row('authors', prepared_author)
-        connect.insert_row('submissions', prepared_submission)
+        
+        new_subreddits.append(prepare_subreddit(submission))
+        new_authors.append(prepare_author(submission))
+        new_posts.append(prepare_submission(submission, sanitized_submission, submission_coins))
 
     # prepares and inserts data from every comment returned from api call into the db
     for comment in comment_list:
+
+        # skips over deleted comments
+        if comment.author is None: continue
+
         sanitized_comment = sanitize.sanitize_text(comment.body)
         mentioned_coins = list(coin_wallet.match_coins(sanitized_comment))
-        prepared_author = prepare_author(comment)
-        prepared_comment = prepare_comment(comment, sanitized_comment, mentioned_coins)
-        connect.insert_row('authors', prepared_author)
-        connect.insert_row('comments', prepared_comment)
+        new_authors.append(prepare_author(comment))
+        new_comments.append(prepare_comment(comment, sanitized_comment, mentioned_coins))
+        
+            
+    connect.insert_row('subreddits', new_subreddits)
+    connect.insert_row('authors', new_authors)
+    connect.insert_row('submissions', new_posts)
+    connect.insert_row('comments', new_comments)
 
