@@ -76,6 +76,3 @@ def insert_row(table_name, data):
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
-
-def check_duplicate(comment_id):
-    """returns True if comment_id already exists in the database"""

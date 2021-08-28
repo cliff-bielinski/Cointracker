@@ -94,6 +94,7 @@ if __name__ == '__main__':
         new_subreddits.append(prepare_subreddit(submission))
         new_authors.append(prepare_author(submission))
         new_posts.append(prepare_submission(submission, sanitized_submission, submission_coins))
+        print("Preparing New Submission.")
 
     # prepares and inserts data from every comment returned from api call into the db
     for comment in comment_list:
@@ -105,6 +106,7 @@ if __name__ == '__main__':
         mentioned_coins = list(coin_wallet.match_coins(sanitized_comment))
         new_authors.append(prepare_author(comment))
         new_comments.append(prepare_comment(comment, sanitized_comment, mentioned_coins))
+        print("Preparing New Comment.")
         
             
     connect.insert_row('subreddits', new_subreddits)
