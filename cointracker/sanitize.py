@@ -1,4 +1,5 @@
 import re
+import nltk
 
 def remove_punctuation(comment):
     """takes string and returns it with non-alphanumeric or whitespace characters removed"""
