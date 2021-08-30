@@ -59,8 +59,21 @@ class Wallet:
             coin_dictionary[coin['symbol'].lower()] = coin['id']
             coin_dictionary[coin['name'].lower()] = coin['id']
 
+        whitelist = self._get_whitelist()
+        
+        for word in whitelist:
+            if word in coin_dictionary:
+                del coin_dictionary[word]
+
         return coin_dictionary
 
+    def _get_whitelist(self):
+        """creates a list of words to be whitelisted from a textfile"""
+        file = open('whitelist.txt', 'r')
+        content = [line.rstrip() for line in file.readlines()]
+        file.close()
+        return content
+    
     def show_wallet(self):
         """returns a dictionary of cryptocurrency in the wallet with coin names and coin symbols mapped to coin id"""
         return self._coin_dict
