@@ -53,7 +53,7 @@ def insert_row(table_name, data):
         # SQL query for insertion into comments table
         comment_query = """
             INSERT INTO comments (comment_id, comment_time, parent_id, score, body, pulled_at, post_id, author_id, coin_id)
-            VALUES (%(id)s, %(time)s, %(parent)s, %(score)s, %(body)s, %(pulled)s, %(post)s, %(author)s, %(coin)s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (comment_id)
             DO NOTHING;
             """

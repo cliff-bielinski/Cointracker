@@ -20,7 +20,6 @@ def get_new_posts(query, location, time, sticky=False):
         post_ids (list) - list of post_ids whose submission data was returned from pushshift call
     """
 
-
     day_num = int((datetime.today() - timedelta(days=time)).timestamp())
 
     api = PushshiftAPI()
@@ -86,32 +85,49 @@ def get_new_comments(comment_ids):
         None
     """
 
-
     authors = []
     comments = []
+    counter = 0
+
+    print(f'There are {len(comment_ids)} comments to parse through.')
 
     for comment_id in comment_ids:
-        print("Preparing new Comment.")
-        comment = reddit.comment(id=comment_id)
 
+        comment = reddit.comment(id=comment_id)
+        print(f'Preparing new Comment... ID:', comment.id)
+        
         if comment.author is None: continue # skips deleted comments
 
-        sanitext = sanitize.sanitize_text(comment.body)
-        coins = coin_wallet.match_coins(sanitext)
+        try:
+            sanitext = sanitize.sanitize_text(comment.body)
+            coins = coin_wallet.match_coins(sanitext)
 
-        # generates lists of author and comment tuples from comment response objects in preparation for insertion into db
-        authors.append((comment.author.id, comment.author.name))
-        comments.append(
-            (comment.id,
-            datetime.fromtimestamp(comment.created_utc),
-            comment.parent_id,
-            comment.score,
-            sanitext,
-            datetime.utcnow(),
-            comment.submission.id,
-            comment.author.id,
-            coins)
-        )
+            # generates lists of author and comment tuples from comment response objects in preparation for insertion into db
+            authors.append((comment.author.id, comment.author.name))
+            comments.append(
+                (comment.id,
+                datetime.fromtimestamp(comment.created_utc),
+                comment.parent_id,
+                comment.score,
+                sanitext,
+                datetime.utcnow(),
+                comment.submission.id,
+                comment.author.id,
+                coins)
+            )
+
+            counter += 1
+            print(f'{counter} comments processed.')
+
+            if counter % 100 == 0:
+                connect.insert_row('authors', authors)
+                connect.insert_row('comments', comments)
+                authors.clear()
+                comments.clear()
+        
+        except AttributeError:
+            print("Deleted comment found. Skipping.")
+            continue
     
     connect.insert_row('authors', authors)
     connect.insert_row('comments', comments)
