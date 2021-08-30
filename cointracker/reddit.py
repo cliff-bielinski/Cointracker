@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from pmaw import PushshiftAPI
 from sanitize import sanitize_text
 import connect
-import pmaw
 import requests
 import requests.auth
 import wallet
@@ -167,7 +166,7 @@ class Reddit:
         # batch insert the queued data to their respective tables
         self._db_write(subreddits=self._subreddits, authors=self._authors, submissions=self._posts)
 
-    def get_comments_from_posts(self, clear=False, posts=None):
+    def get_comment_ids_from_posts(self, clear=False, posts=None):
         """
         adds a list of all comment IDs for a given list of post IDs using Pushshift API
         
