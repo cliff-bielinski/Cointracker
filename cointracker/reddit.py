@@ -1,11 +1,12 @@
 from config.config import config
 from datetime import datetime, timedelta
 from pmaw import PushshiftAPI
-from sanitize import sanitize_text
+from sanitize import TextProcessing
 import connect
 import requests
 import requests.auth
 import wallet
+
 
 class Reddit:
     """
@@ -98,7 +99,7 @@ class Reddit:
                 continue
             
             print('Preparing comment for the queue...')
-            text = sanitize_text(comment['data']['body'])
+            text = TextProcessing.sanitize_text(comment['data']['body'])
             coins = wallet.match_coins(text)
 
             self._authors.append((comment['data']['author_fullname'], comment['data']['author']))
@@ -147,7 +148,7 @@ class Reddit:
             # if the post is not in the DB, add post data to insertion queue in tuple form
             if not connect.post_exists(post['id']):
                 print("Preparing new Post...")
-                text = sanitize_text(post['selftext'])
+                text = TextProcessing.sanitize_text(post['selftext'])
                 print("Finding coins...")
                 coins = wallet.match_coins(text)
 

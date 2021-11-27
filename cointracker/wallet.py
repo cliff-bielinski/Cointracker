@@ -1,6 +1,7 @@
 import math
 import requests
 
+
 class Wallet:
     """
     a class that represents a collection of cryptocurrencies

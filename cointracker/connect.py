@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2.extras import execute_batch
 from config.config import config
 
+
 def insert_row(table_name, data):
     """
     connect to the database server and inserts data as row in table for db
