@@ -7,7 +7,7 @@ class TextProcessing:
 
     def __init__(self):
         """creates new TextProcessing object"""
-        pass
+        self.stopwords = nltk.corpus.stopwords.words('English')
 
     @staticmethod
     def remove_punctuation(comment):
@@ -21,12 +21,18 @@ class TextProcessing:
         return comment.strip()
 
     @staticmethod
-    def sanitize_text(comment):
-        """takes string and returns a tokenized list of words without punctuation, whitespace or capitalization"""
-        comment = comment.lower()
-        comment = TextProcessing.remove_punctuation(comment)
-        comment = TextProcessing.remove_whitespace(comment)
-        comment = comment.split()
-        return comment
+    def tokenize(comment):
+        """takes a string and removes whitespace, capitalization and punctuation before turning string into a list"""
+        words = comment.lower()
+        words = TextProcessing.remove_punctuation(words)
+        words = TextProcessing.remove_whitespace(words)
+        words = words.split()
+        return words
+
+    def sanitize_text(self, comment):
+        """takes string and tokenizes text and removes common stopwords from resultant list"""
+        words = self.tokenize(comment)
+        words = [word for word in words if word not in self.stopwords]
+        return words
 
 
