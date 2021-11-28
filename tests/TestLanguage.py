@@ -30,6 +30,13 @@ class TestSanitize(unittest.TestCase):
         mod_str = text_san.remove_punctuation(test_str)
         self.assertEqual('No more punctuation', mod_str)
 
+    def test_get_polarity_scores(self):
+        reddit_comment = """Fuck me it just keeps dipping. The only positive is that at least people will stop taking 
+        plan b's ridiculous predictions based on made up bullshit seriously now."""
+        text_san = cointracker.sanitize.TextProcessing()
+        pol_score = text_san.get_polarity_score(reddit_comment)
+        print(pol_score)
+
 
 class TestProcessing(unittest.TestCase):
     """Unit testing for language processing"""

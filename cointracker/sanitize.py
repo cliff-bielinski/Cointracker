@@ -1,5 +1,6 @@
 import re
 import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 
 class TextProcessing:
@@ -8,6 +9,7 @@ class TextProcessing:
     def __init__(self):
         """creates new TextProcessing object"""
         self.stopwords = nltk.corpus.stopwords.words('English')
+        self.sia = SentimentIntensityAnalyzer()
 
     @staticmethod
     def remove_punctuation(comment):
@@ -35,4 +37,7 @@ class TextProcessing:
         words = [word for word in words if word not in self.stopwords]
         return words
 
+    def get_polarity_score(self, comment):
+        """takes a comment (as string, not tokenized) and returns a dictionary of polarity scores"""
+        return self.sia.polarity_scores(comment)
 
